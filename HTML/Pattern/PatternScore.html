@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Pattern Scores</title>
+    <link rel="stylesheet" href="..\..\CSS\Pattern\PatternScore.css">
+</head>
+
+<body id="score-body">
+    <div class="background"></div>
+    <div class = "noFont">
+    <div class="wrapper">
+        <header>
+            <a>Memorize the Pattern</a>
+            <a>High Scores:</a>
+        </header>
+        <br>
+        <a> <span id="play1"></span><br><br>
+            <span id="play2"></span><br><br>
+            <span id="play3"></span><br><br>
+            <span id="play4"></span><br><br>
+            <span id="play5"></span>    </a>
+            <br><br><br>
+        <nav>
+            <a href="PatternGame.html">Play Again</a><br><br>
+            <a href="..\home.html">Home</a>
+        </nav>
+        <a>
+            <p>User Statistics:</p>
+            <a id="netScore"></a><br>
+            <a id="avgScore"></a><br>
+            <a id="netGames"></a>
+        </a>
+    </div>
+    </div>
+    <script>
+        fetch('http://localhost:8080/patternScore', {
+            method: "POST",
+        }).then(res => res.text()).then(function (text) {
+            var arr = text.split("/");
+            document.getElementById('play1').innerText = arr[0].replace(/^"(.*)"$/, '$1') + " - " + arr[5];
+            document.getElementById('play2').innerText = arr[1].replace(/^"(.*)"$/, '$1') + " - " + arr[6];
+            document.getElementById('play3').innerText = arr[2].replace(/^"(.*)"$/, '$1') + " - " + arr[7];
+            document.getElementById('play4').innerText = arr[3].replace(/^"(.*)"$/, '$1') + " - " + arr[8];
+            document.getElementById('play5').innerText = arr[4].replace(/^"(.*)"$/, '$1') + " - " + arr[9];
+        })
+
+        fetch('http://localhost:8080/stats', {
+            method: "POST",
+            body: JSON.stringify({
+                input: document.getElementById('netScore').value,
+                phrase: document.getElementById('netGames').value
+            }),
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8"
+            }
+            }).then(res => res.text()).then(function (text) {
+                var arr = text.split("/");
+                document.getElementById('netGames').innerText = "Games Played - " + arr[3];
+                document.getElementById('avgScore').innerText = "Average Score - " + Math.round(arr[2] / arr[3]);
+                document.getElementById('netScore').innerText = "Total Score - " + arr[2];
+            })
+    </script>
+</body>
+
+</html>

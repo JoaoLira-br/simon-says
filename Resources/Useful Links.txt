@@ -1,0 +1,15 @@
+Trello page
+
+	https://trello.com/b/jC2JnJ7M/g10
+	
+Gitlab project
+
+	https://git.linux.iastate.edu/Spring2022-CS319/g10/319-project
+
+319 Discord group
+
+	https://discord.gg/kEaYmK6b
+
+Some Basics on git
+
+	https://github.com/git-guides/git-push

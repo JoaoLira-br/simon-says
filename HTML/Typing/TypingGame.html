@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>Typing Game</title>
+  <!-- NOTE: MUST USE RELATIVE PATH "\" -->
+  <link rel="stylesheet" href="..\..\CSS\Typing\TypingGame.css">
+</head>
+
+<body>
+  <div class="background"></div>
+  <div class="noFont">
+  <div class="wrapper">
+    <!-- Header for the Typing Game -->
+    <header>
+      <a>Typing Game</a><br><br>
+    </header>
+    <main>
+      <!-- Div to hold the phrase the user must type -->
+      <div id = "phrase" class = "phrase"></div>
+      <br />
+      <!-- Div to hold the current user score -->
+      <div id = "score" class = "a"></div>
+    </main>
+    <br /><br /><br />
+    <!-- Input field for the user to type in -->
+        <input type = "text"
+          id = "user-input"
+          name = "user-input"
+          onkeypress = "clickPress(event)"
+          autocomplete = "off"
+        />
+    <br /><br /><br />
+    <button id = "easy" onClick = "diff_select(this.id)">Easy</button>
+    <button id = "med" onClick = "diff_select(this.id)">Medium</button>
+    <button id = "hard" onClick = "diff_select(this.id)">Hard</button>
+    <div id = "timer"></div>
+  </div>
+  </div>
+  <!-- Javascript specifically for the front end of the page -->
+  <script>
+    //Create timer and difficulty variables
+    var diff = 6000;
+    var timeout = setTimeout(()=>{location.replace("./TypingScore.html");},1000000);
+    var now = 0;
+    var diffId = "med";
+    //Function to handle a user click
+    function clickPress(event){
+      //Get the current score
+      var num = document.getElementById('score').innerText;
+      //Check to see if the score has appeared on the game board
+
+        //Set the num variable to just the numeric part
+        if(num!==""){
+          num = parseInt(num);
+        }
+
+
+      //Check to see if the user key press is enter
+      if(event.keyCode == 13){
+        //Clear the current timer
+        window.clearTimeout(timeout);
+        //If enter is pressed, send a post request to the end point
+        fetch('http://localhost:8080/phrase', {
+        method: "POST",
+        //Create a header and body for the post request
+        body: JSON.stringify({
+          //Set the keys as input, phrase, and score, then set correct variables from page
+          input: document.getElementById('user-input').value,
+          phrase: document.getElementById('phrase').innerText,
+          score: num,
+          diffId: diffId
+        }),
+        headers: {
+          //Set a header to declare the type of object being sent as the request
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      })
+      //Convert response to plain text
+        .then(res => res.text())
+        .then(function (text){
+          //Create an array from the values, splitting at the occurrences of '/'
+          var arr = text.split("/");
+          //Set variables on the page to the corresponding array positions
+          document.getElementById('phrase').innerText = arr[2];
+          document.getElementById('score').innerText = arr[0];
+          document.getElementById('user-input').value = "";
+          //Check to see if the end game condition has been reached
+          if(arr[1] === 'true'){
+            fetch('http://localhost:8080/tScore', {
+                method: "POST",
+                //Create a header and body for the post request
+                body: JSON.stringify({
+                  //Puts score variable in request
+                  score: num
+                }),
+                headers: {
+                  //Set a header to declare the type of object being sent as the request
+                  "Content-type": "application/json; charset=UTF-8"
+                }
+            })
+            fetch('http://localhost:8080/checkTyping', {
+                method: "GET",
+            }).then(res => res.text()).then(function (text) {
+                console.log(text);
+                if(text === "true"){
+                    var name = prompt("Congratulations! Enter your name for a new high score!");
+                    fetch('http://localhost:8080/tName', {
+                        method: "POST",
+                        body: JSON.stringify({
+                            name: name
+                        }),
+                        headers: {
+                            "Content-type": "application/json; charset=UTF-8"
+                        }
+                    })
+                    window.location.href = "TypingScore.html";
+                }else{
+                    window.location.href = "TypingScore.html";
+                }
+            })
+
+          }
+          //Reset the timer based on the difficulty
+          timeout = setTimeout(()=>{
+            fetch('http://localhost:8080/tScore', {
+                method: "POST",
+                //Create a header and body for the post request
+                body: JSON.stringify({
+                  //Puts score variable in request
+                  score: num
+                }),
+                headers: {
+                  //Set a header to declare the type of object being sent as the request
+                  "Content-type": "application/json; charset=UTF-8"
+                }
+            })
+            fetch('http://localhost:8080/checkTyping', {
+                method: "GET",
+            }).then(res => res.text()).then(function (text) {
+                console.log(text);
+                if(text === "true"){
+                    var name = prompt("Congratulations! Enter your name for a new high score!");
+                    fetch('http://localhost:8080/tName', {
+                        method: "POST",
+                        body: JSON.stringify({
+                            name: name
+                        }),
+                        headers: {
+                            "Content-type": "application/json; charset=UTF-8"
+                        }
+                    })
+                    window.location.href = "TypingScore.html";
+                }else{
+                    window.location.href = "TypingScore.html";
+                }
+            })
+          },diff);
+          now = 0;
+        })
+      }
+    }
+
+    //Handles difficulty of game
+    function diff_select(id){
+      //Change difficulty variable based on which button is pressed
+      if(id === "easy"){
+        diff = 10000;
+        diffId = "easy";
+      }else if(id == "med"){
+        diff = 6000;
+        diffId = "med";
+      }else{
+        diff = 3000;
+        diffId = "hard";
+      }
+      //Hide all buttons so the user cannot change part of the way through
+      document.getElementById('easy').hidden = true;
+      document.getElementById('med').hidden = true;
+      document.getElementById('hard').hidden = true;
+    }
+
+    //Handles updating the countdown timer
+    var time = setInterval(function(){
+      //Check if game has started (word is present in phrase div)
+      if(document.getElementById('phrase').innerText !== ""){
+        //Create distance from now to end of timer
+        var dist = (diff / 1000) - now;
+        //Increment now variable
+        now += 1;
+        //Update timer div with new number
+        document.getElementById('timer').innerHTML = dist;
+      }
+    }, 1000);
+  </script>
+</body>
+
+</html>

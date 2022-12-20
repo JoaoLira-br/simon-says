@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang = "en">
+    <head>
+        <title>Pattern Game</title>
+        <script async src= "../../JS/Pattern/PatternGame.js"></script>
+        <link rel="stylesheet" href="..\..\CSS\Pattern\PatternGame.css">
+    </head>
+    <body>
+        <div class="background"></div>
+        <div class="noFont">
+        <table style = "margin:auto;  border-color:black;border: 1px;" >
+            <tr>
+                <td id = "cell1" >
+                    <canvas id = "can1" style = "background-color: lightyellow;" ></canvas>
+                </td>
+                <td id = "cell2">
+                    <canvas id = "can2" style = "background-color: lightcoral;"></canvas>
+                </td>
+            </tr>
+            <tr>
+                <td id = "cell3">
+                    <canvas id ="can3" style = "background-color: lightblue;" ></canvas>
+                </td>
+                <td id = "cell4">
+                    <canvas id = "can4" style = "background-color: lightgreen;" ></canvas>
+                </td>
+            </tr>
+        </table>
+        <p class = "centerButton">
+            <input id = "start" type = "button" value = "Start" class ="buttonSize">
+            <input id = "Easy"   type = "button" value = "Slow" class = "buttonSize">
+            <input id = "Medium" type = "button" value = "Normal" class = "buttonSize">
+            <input id = "Hard"   type = "button" value = "Fast" class = "buttonSize">
+            <input onClick="window.location.href ='PatternScore.html'"  type ="button" value = "Score Page" class="buttonSize">
+        </p>
+        </div>
+    </body>
+</html>
